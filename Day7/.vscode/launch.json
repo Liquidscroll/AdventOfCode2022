@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/mandi/Documents/AdventOfCode2022/Day6",
-      "program": "c:/Users/mandi/Documents/AdventOfCode2022/Day6/build/Debug/outDebug",
+      "cwd": "c:/Users/mandi/Documents/AdventOfCode2022/Day7",
+      "program": "c:/Users/mandi/Documents/AdventOfCode2022/Day7/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

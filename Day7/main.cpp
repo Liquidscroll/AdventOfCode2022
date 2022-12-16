@@ -69,7 +69,16 @@ struct fileFolder
         }
         return size;
     }
-
+    void returnDirSizes(std::vector<int>& sizes)
+    {
+        if(isDirectory) { sizes.push_back(size);
+        
+        for(auto &child : children)
+        {
+         child.returnDirSizes(sizes);   
+        }
+    }
+}
 };
 
 int main()
@@ -82,17 +91,24 @@ int main()
 
     fileFolder* currentDir = &fileTree;
     std::string line;
-    while(inputFile)
+    while(std::getline(inputFile, line))
     {
-        char dollar;
-        std::string command, argument;
-        if (inputFile.eof()) break;
+        if(line[0] == '$')
+        {
+            interpretCommands = true;
+        }
+        else
+        {
+            interpretCommands = false;
+        }
+        
         counter++;
-        std::cout << counter << std::endl;
+        std::cout << "Loop: " << counter << std::endl;
         if(interpretCommands)
         {
+            char dollar;
+            std::string command, argument;
             inputFile >> dollar >> command;
-            std::cout << dollar << command << std::endl;
             if(command == "cd")
             {
                 inputFile >> argument;
@@ -109,30 +125,31 @@ int main()
                     if(child.name == argument)
                     {
                         currentDir = &child;
-                        continue;
                     }
                 }
             }
             if(command == "ls")
             {
                 interpretCommands = false;
+                continue;
                 
             }
 
         } 
         else
         {
+            std::string command;
             inputFile >> command;
-            std::cout << command << std::endl;
 
             if(command == "$")
             {
-                inputFile.seekg(2, std::ios::cur);
+                inputFile.seekg(-2, std::ios::cur);
                 interpretCommands = true;
             } else if (command == "dir")
             {
                 std::string inputName;
                 inputFile >> inputName;
+                std::cout << "command: " << command << " arg: " << inputName << std::endl;
 
                 currentDir->children.push_back( {currentDir, 0, true, inputName, dirChildren});
             }
@@ -152,8 +169,17 @@ int main()
     
 
     fileTree.distributeChildSizes();
+    std::vector<int> sizes;
+    fileTree.returnDirSizes(sizes);
     fileTree.printDirectory();
-    int answer = fileTree.sumSizes();
+    int answer = 0;
+    for(auto &size : sizes)
+    {
+        if(size < 100000)
+        {
+        answer += size;
+        }
+    }
     std::cout << "Answer to Part 1: " << answer << std::endl;
     return 0;
 }

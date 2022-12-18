@@ -156,8 +156,8 @@ int main()
             else
             {
                 int size;
-                std::stringstream s(command);
-                s >> size;
+                //std::stringstream s(command);
+                inputFile >> size;
 
                 std::string name;
                 inputFile >> name;

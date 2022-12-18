@@ -52,7 +52,6 @@
     "deque": "cpp",
     "string": "cpp",
     "unordered_map": "cpp",
-    "unordered_set": "cpp",
     "vector": "cpp",
     "exception": "cpp",
     "algorithm": "cpp",
@@ -76,9 +75,9 @@
     "new": "cpp",
     "numbers": "cpp",
     "ostream": "cpp",
+    "sstream": "cpp",
     "stdexcept": "cpp",
     "streambuf": "cpp",
-    "typeinfo": "cpp",
-    "sstream": "cpp"
+    "typeinfo": "cpp"
   }
 }

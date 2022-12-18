@@ -20,15 +20,10 @@ void printGrid(std::vector<std::vector<int>> const &gridMatrix)
 
 bool countVisible(std::vector<std::vector<int>> const &gridMatrix, size_t row, size_t col, int size)
 {
-   /*Function that will take the position of a tree and see if all other trees between it and an edge of the grid
-   are shorter than it and thus if it is visible from the edge of the grid.*/
  int gridSize = gridMatrix.size();
  bool treeVisible = false; 
- //std::cout << "Here at: " << row << "," << col << std::endl;
-  //iterate over row
   for(int i = row - 1; i >= 0; i--)
   {
-   // std::cout << "current: " << gridMatrix[i][col] << std::endl;
     if(gridMatrix[i][col] >= size)
     {
         treeVisible = false;
@@ -41,8 +36,6 @@ bool countVisible(std::vector<std::vector<int>> const &gridMatrix, size_t row, s
   }
   for(int i = row + 1; i < gridSize; i++)
   {
-
-    //std::cout << "current: " << gridMatrix[i][col] << std::endl;
     if(gridMatrix[i][col] >= size)
     {
         treeVisible = false;
@@ -52,11 +45,8 @@ bool countVisible(std::vector<std::vector<int>> const &gridMatrix, size_t row, s
         return true;
     }  
   }
-
-  //iterate over column
   for(int i = col - 1; i >= 0; i--)
   {
-   // std::cout << "current: " << gridMatrix[i][col] << std::endl;
     if(gridMatrix[row][i] >= size)
     {
         treeVisible = false;
@@ -66,10 +56,8 @@ bool countVisible(std::vector<std::vector<int>> const &gridMatrix, size_t row, s
         return true;
     }
   }
-
   for(int i = col + 1; i < gridSize; i++)
   {
-    //std::cout << "current: " << gridMatrix[i][col] << std::endl;
     if(gridMatrix[row][i] >= size)
     {
         treeVisible = false;
@@ -82,9 +70,69 @@ bool countVisible(std::vector<std::vector<int>> const &gridMatrix, size_t row, s
   return treeVisible;
 }
 
+int calcScenicScore(std::vector<std::vector<int>> const &gridMatrix, int col, int row, int size)
+{
+    int totalRows = gridMatrix.size();
+    int totalCols = gridMatrix[0].size();
+    int northScore = 0, southScore = 0, eastScore = 0, westScore = 0;
+
+    for(int i = col - 1; i >= 0; i--)
+    {
+        if(gridMatrix[row][i] >= size)
+        {
+            northScore++;
+            break;
+        }
+        if(gridMatrix[row][i] < size)
+        {
+            northScore++;
+        }
+    }
+
+    for (int i = col + 1; i < totalCols; i++)
+    {
+        if(gridMatrix[row][i] >= size)
+        {
+            southScore++;
+            break;
+        }
+        if(gridMatrix[row][i] < size)
+        {
+            southScore++;
+        }
+    }
+
+    for (int i = row - 1; i >= 0; i --)
+    {
+        if(gridMatrix[i][col] >= size)
+        {
+            westScore++;
+            break;
+        }
+        if(gridMatrix[i][col] < size)
+        {
+            westScore++;
+        }
+    }
+    for(int i = row + 1; i < totalRows; i++)
+    {
+        if(gridMatrix[i][col] >= size)
+        {
+            eastScore++;
+            break;
+        }
+        if(gridMatrix[i][col] < size)
+        {
+            eastScore++;
+        }
+    }
+
+    return (northScore * southScore * eastScore * westScore);
+}
+
 int visibleTreesPart1(std::vector<std::vector<int>> const &gridMatrix)
 {
-    int treeCounter;
+    int treeCounter = 0;
     for(size_t i = 0; i < gridMatrix.size(); i++)
     {
         for(size_t j = 0; j < gridMatrix[i].size(); j++)
@@ -95,10 +143,8 @@ int visibleTreesPart1(std::vector<std::vector<int>> const &gridMatrix)
             }
             else
             {
-                std::cout << std::boolalpha << "countVisible return: " << countVisible(gridMatrix, i, j, gridMatrix[i][j]) << " at position: " << i << "," << j << std::endl;
                 if(countVisible(gridMatrix, i, j, gridMatrix[i][j])) 
                 { 
-                    std::cout << "here1" << std::endl; 
                     treeCounter++;
                 }
             }
@@ -108,13 +154,36 @@ int visibleTreesPart1(std::vector<std::vector<int>> const &gridMatrix)
     return treeCounter;
 }
 
+int highestScenicScore(std::vector<std::vector<int>> const &gridMatrix)
+{
+    std::vector<int> scenicScoreArray;
+    int highestScore = 0;
+    int highestRow, highestCol;
+    for(size_t i = 0; i < gridMatrix.size(); i++)
+    {
+        highestRow++;
+        for(size_t j = 0; j < gridMatrix[i].size(); j++)
+        {
+            highestCol++;
+            int scenicScore = calcScenicScore(gridMatrix, i, j, gridMatrix[i][j]);
+            scenicScoreArray.push_back(scenicScore);
+            if(scenicScore >= highestScore)
+            {
+                highestScore = scenicScore;
+                std::cout << "Score: " << highestScore << "i: " << highestRow << "j: " << highestCol << std::endl;
+            }
+        }
+    }
+    return highestScore;
+}
+
 int main()
 {
-    std::ifstream input_file("inputexample.txt");
+    std::ifstream input_file("input.txt");
     std::string line;
     std::vector<std::vector<int>> inputGrid;
     std::vector<int> row;
-    int counter = 0;
+    int answer1 = 0, answer2 = 0;
     while(input_file >> line)
     {
         row.clear();
@@ -125,10 +194,11 @@ int main()
         inputGrid.push_back(row);
     }
 
-    printGrid(inputGrid);
-    counter = visibleTreesPart1(inputGrid);
-    //counter += (inputGrid.size() * 4 - 4);
-    std::cout << "Answer Part 1: " << counter << std::endl;
-
-  return 0;
+    //printGrid(inputGrid);
+    answer1 = visibleTreesPart1(inputGrid);
+    answer1 += (inputGrid.size() * 4 - 4);
+    answer2 = highestScenicScore(inputGrid);
+    std::cout << "Answer Part 1: " << answer1 << std::endl;
+    std::cout << "Answer Part 2: " << answer2 << std::endl;
+    return 0;
 }

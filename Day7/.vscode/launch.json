@@ -8,10 +8,10 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/mandi/Documents/AdventOfCode2022/Day7",
-      "program": "c:/Users/mandi/Documents/AdventOfCode2022/Day7/build/Debug/outDebug",
+      "cwd": "c:/Users/mandi/Documents/AdventOfCode2022/Day8",
+      "program": "${workspaceFolder}/main.exe",
       "MIMode": "gdb",
-      "miDebuggerPath": "gdb",
+      "miDebuggerPath": "c:\\msys64\\mingw64\\bin\\gdb.exe",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",

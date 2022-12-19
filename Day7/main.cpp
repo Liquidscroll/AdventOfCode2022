@@ -23,20 +23,19 @@ struct fileFolder
         return upperDirectory;
     }
 
-    void printDirectory(size_t depth = 0)
+    void printDirectory(int depth)
     {
         std::cout << std::string(depth, ' ') << " - " << name;
 
-        if(size == 0)
+        if(this->isDirectory)
         {
-            std::cout << " (dir)";
+            std::cout << " (dir, size: " << size << ")";
         }
         else 
         {
-            std::cout << " (file, size=" << size << ")";
+            std::cout << " (file, size: " << size << ")";
         }
         std::cout << std::endl;
-
         for(auto& child : children)
         {
             child.printDirectory(depth + 1);
@@ -45,7 +44,6 @@ struct fileFolder
 
     int sumSizes()
     {
-        std::cout << "size: " << this->size << std::endl;
         int sum = 0;
         if(isDirectory && this->size < 100000) { sum += this->size; }
 
@@ -57,61 +55,80 @@ struct fileFolder
         return sum;
     }
 
-    int distributeChildSizes()
+    int fillDirSizes()
     {
-        if (size > 0) { return size; }
+        if (this->isDirectory == false) { return this->size; }
 
-        size = 0;
+        int totalSize = 0;
 
         for(auto &child : children)
         {
-            size += child.distributeChildSizes();
+            totalSize += child.fillDirSizes();
         }
-        return size;
+        this->size = totalSize;
+        return this->size;
     }
-    void returnDirSizes(std::vector<int>& sizes)
+    int returnDirSizes(int filterSize)
     {
-        if(isDirectory) { sizes.push_back(size);
+        int totalSize = 0;
+        if(this->isDirectory && this->size <= filterSize) { totalSize += this->size; }
         
         for(auto &child : children)
         {
-         child.returnDirSizes(sizes);   
+         totalSize += child.returnDirSizes(filterSize);   
         }
+
+        return totalSize;
     }
-}
+    void returnSizePart2(std::vector<int> &sizeVector)
+    {
+        if(this->isDirectory)
+        { 
+            sizeVector.push_back(this->size);
+        }
+        
+        for(auto &child : children)
+        {
+            child.returnSizePart2(sizeVector);
+        }
+        return;
+    }
+
 };
+
 
 int main()
 {
-    std::ifstream inputFile("inputexample.txt");
+    int const &capacity = 70000000;
+    std::ifstream inputFile("input.txt");
+    if(inputFile.is_open()) std::cout << "File Opened" << std::endl;
     std::vector<fileFolder> dirChildren;
-    bool interpretCommands = true;
-    int counter = 0;
+    bool interpretCommands = false;
     fileFolder fileTree { nullptr, 0, true, "/", dirChildren};
-
-    fileFolder* currentDir = &fileTree;
     std::string line;
+    fileFolder* currentDir = &fileTree;
+
+    std::string firstInput;
     while(std::getline(inputFile, line))
     {
-        if(line[0] == '$')
+        if(line.front() == '$')
         {
             interpretCommands = true;
         }
-        else
+        else if (line.front() != '$')
         {
             interpretCommands = false;
         }
         
-        counter++;
-        std::cout << "Loop: " << counter << std::endl;
         if(interpretCommands)
         {
-            char dollar;
             std::string command, argument;
-            inputFile >> dollar >> command;
+            size_t secondSpace = line.find_first_of(' ', 2);
+            command = line.substr(2, 2);
+            if(command == "ls") continue;
+            argument = line.substr(secondSpace + 1, line.size() - secondSpace);
             if(command == "cd")
             {
-                inputFile >> argument;
                 if(argument == "..")
                 {
                     currentDir = currentDir->upperDirectory;
@@ -128,58 +145,46 @@ int main()
                     }
                 }
             }
-            if(command == "ls")
-            {
-                interpretCommands = false;
-                continue;
-                
-            }
-
         } 
-        else
+        else if(interpretCommands == false)
         {
-            std::string command;
-            inputFile >> command;
-
-            if(command == "$")
+            std::string command, argument;
+            size_t space = line.find_first_of(' ');
+            command = line.substr(0, space);
+            argument = line.substr(space + 1);
+            if (command == "dir")
             {
-                inputFile.seekg(-2, std::ios::cur);
-                interpretCommands = true;
-            } else if (command == "dir")
-            {
-                std::string inputName;
-                inputFile >> inputName;
-                std::cout << "command: " << command << " arg: " << inputName << std::endl;
-
-                currentDir->children.push_back( {currentDir, 0, true, inputName, dirChildren});
+                currentDir->children.push_back( {currentDir, 0, true, argument, dirChildren});
             }
             else
             {
-                int size;
-                //std::stringstream s(command);
-                inputFile >> size;
-
-                std::string name;
-                inputFile >> name;
-
-                currentDir ->children.push_back({currentDir, size, false, name, dirChildren});
+                currentDir ->children.push_back({currentDir, std::stoi(command), false, argument, dirChildren});
             }
-        }   
+        }  
     }
     
+    fileTree.fillDirSizes();
+    fileTree.printDirectory(0);
+    int answer = fileTree.returnDirSizes(100000);
 
-    fileTree.distributeChildSizes();
-    std::vector<int> sizes;
-    fileTree.returnDirSizes(sizes);
-    fileTree.printDirectory();
-    int answer = 0;
-    for(auto &size : sizes)
+    int stored = fileTree.size;
+    int freeSpace = capacity - stored;
+    int toFind = 30000000 - freeSpace;
+
+    std::vector<int> dirSizeVector;
+    fileTree.returnSizePart2(dirSizeVector);
+    std::sort(dirSizeVector.begin(), dirSizeVector.end());
+    int smallestDir = fileTree.size;
+    for(int i = dirSizeVector.size(); i >= 0; i--)
     {
-        if(size < 100000)
+        if(dirSizeVector[i] > toFind && dirSizeVector[i] < smallestDir)
         {
-        answer += size;
+            smallestDir = dirSizeVector[i];
         }
     }
+
+
     std::cout << "Answer to Part 1: " << answer << std::endl;
+    std::cout << "Answer to Part 2: " << smallestDir << std::endl;
     return 0;
 }

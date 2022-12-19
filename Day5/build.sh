@@ -1,4 +1,9 @@
 echo "Starting Building"
 d=$(date +%s)
-g++ -Wall -Wextra -pedantic -std=c++20 main.cpp -o main.exe
-echo "Build took $(($(date +%s)-d)) seconds."
+g++ -g -Wall -Wextra -pedantic -std=c++20 main.cpp -o main.exe
+if [ $? -ne 0 ];
+then
+	echo "Build failed."
+else
+	echo "Build took $(($(date +%s)-d)) seconds."	
+fi

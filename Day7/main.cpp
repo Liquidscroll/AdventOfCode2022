@@ -164,7 +164,7 @@ int main()
     }
     
     fileTree.fillDirSizes();
-    fileTree.printDirectory(0);
+    //fileTree.printDirectory(0);
     int answer = fileTree.returnDirSizes(100000);
 
     int stored = fileTree.size;
@@ -182,7 +182,6 @@ int main()
             smallestDir = dirSizeVector[i];
         }
     }
-
 
     std::cout << "Answer to Part 1: " << answer << std::endl;
     std::cout << "Answer to Part 2: " << smallestDir << std::endl;

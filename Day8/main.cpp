@@ -70,12 +70,9 @@ bool countVisible(std::vector<std::vector<int>> const &gridMatrix, size_t row, s
   return treeVisible;
 }
 
-int calcScenicScore(std::vector<std::vector<int>> const &gridMatrix, int col, int row, int size)
+int calcScenicScore(std::vector<std::vector<int>> const &gridMatrix, int row, int col, int size)
 {
-    int totalRows = gridMatrix.size();
-    int totalCols = gridMatrix[0].size();
     int northScore = 0, southScore = 0, eastScore = 0, westScore = 0;
-
     for(int i = col - 1; i >= 0; i--)
     {
         if(gridMatrix[row][i] >= size)
@@ -88,8 +85,7 @@ int calcScenicScore(std::vector<std::vector<int>> const &gridMatrix, int col, in
             northScore++;
         }
     }
-
-    for (int i = col + 1; i < totalCols; i++)
+    for (size_t i = col + 1; i < gridMatrix[0].size(); i++)
     {
         if(gridMatrix[row][i] >= size)
         {
@@ -101,7 +97,6 @@ int calcScenicScore(std::vector<std::vector<int>> const &gridMatrix, int col, in
             southScore++;
         }
     }
-
     for (int i = row - 1; i >= 0; i --)
     {
         if(gridMatrix[i][col] >= size)
@@ -114,7 +109,7 @@ int calcScenicScore(std::vector<std::vector<int>> const &gridMatrix, int col, in
             westScore++;
         }
     }
-    for(int i = row + 1; i < totalRows; i++)
+    for(size_t i = row + 1; i < gridMatrix.size(); i++)
     {
         if(gridMatrix[i][col] >= size)
         {
@@ -127,7 +122,7 @@ int calcScenicScore(std::vector<std::vector<int>> const &gridMatrix, int col, in
         }
     }
 
-    return (northScore * southScore * eastScore * westScore);
+    return (northScore * southScore * westScore * eastScore);
 }
 
 int visibleTreesPart1(std::vector<std::vector<int>> const &gridMatrix)
@@ -156,21 +151,15 @@ int visibleTreesPart1(std::vector<std::vector<int>> const &gridMatrix)
 
 int highestScenicScore(std::vector<std::vector<int>> const &gridMatrix)
 {
-    std::vector<int> scenicScoreArray;
-    int highestScore = 0;
-    int highestRow, highestCol;
+    int highestScore = 1;
     for(size_t i = 0; i < gridMatrix.size(); i++)
     {
-        highestRow++;
         for(size_t j = 0; j < gridMatrix[i].size(); j++)
         {
-            highestCol++;
             int scenicScore = calcScenicScore(gridMatrix, i, j, gridMatrix[i][j]);
-            scenicScoreArray.push_back(scenicScore);
             if(scenicScore >= highestScore)
             {
                 highestScore = scenicScore;
-                std::cout << "Score: " << highestScore << "i: " << highestRow << "j: " << highestCol << std::endl;
             }
         }
     }

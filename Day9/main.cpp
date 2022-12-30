@@ -5,6 +5,9 @@
 #include <vector>
 #include <numeric>
 #include <sstream>
+#include <map>
+#include <cmath>
+#include <tuple>
 
 enum direction
 {
@@ -16,108 +19,78 @@ enum direction
 
 struct ropePoint
 {
-    int x;
-    int y;
-
-    bool isTail;
-    int tailSteps;
-
-
-    ropePoint(int x, int y, bool isTail)
-    {
-        this->x = x;
-        this->y = y;
-        this->isTail = isTail;
-        this->tailSteps = 0;
-    }
-
-    void movePoint(std::string dir, int numSteps, ropePoint &tail)
-    {
-        std::cout << "tailSteps: " << tail.tailSteps << std::endl;
-        if(dir == "U")
-        {
-                for(int i = 0; i < numSteps; i++)
-                {
-                    this->y--;
-                    tail.updateTail(this->x, this->y);
-                }
-        }
-                if(dir == "D")
-                {
-                    for(int i = 0; i < numSteps; i++)
-                {
-                    this->y++;
-                    tail.updateTail(this->x, this->y);
-                }
-                }
-            if(dir == "L")
-            {
-            for(int i = 0; i < numSteps; i++)
-            {
-                    this->x--;
-                    tail.updateTail(this->x, this->y);
-            }
-            }
-            if(dir == "R")
-            {
-                for(int i = 0; i < numSteps; i++)
-            {
-                    this->y--;
-                    tail.updateTail(this->x, this->y);
-            }
-            }
-
-        }
-    void updateTail(int headX, int headY)
-    {
-        bool moved = false;
-        if(std::abs(this->x-headX) > 1)
-        {
-            moved = true;
-            if(this->x > headX)
-            {
-            this->x++;
-            } else
-            {
-                this->x--;
-            }
-        }
-        if(std::abs(this->y-headY) > 1)
-        {
-            moved = true;
-            if(this->y < headY)
-            {
-                this->y++;
-            } else
-            {
-                this->y--;
-            }
-        }
-        if(moved)
-        {
-            this->tailSteps++;
-        }
-    }
-
+    int x = 0;
+    int y = 0;
 };
+std::map<std::string, bool> moveTail(ropePoint* points, int arrSize, std::map<std::string, bool>& visited)
+{
+    for(int knot = 1; knot < arrSize; knot++)
+    {
+        int xDist = (points[knot-1].x - points[knot].x);
+        int yDist = (points[knot-1].y - points[knot].y);
+
+        if(sqrt(xDist * xDist + yDist * yDist) > 1.5)
+        {
+            if(xDist > 0) { points[knot].x++; }
+            else if(xDist < 0) { points[knot].x--; }
+        
+            if(yDist > 0) { points[knot].y++; }
+            else if(yDist < 0) { points[knot].y--; }
+        
+            if(knot == arrSize - 1)
+            {
+                std::string pos = std::to_string(points[knot].x) + "," + std::to_string(points[knot].y);
+
+                visited.insert({std::string(pos), true});
+            }
+        
+        }
+    }
+    return visited;
+}
+std::map<std::string, bool> movePoint(std::string command, ropePoint* points, int arrSize, std::map<std::string, bool>& visited)
+{
+   
+        if(command == "U") { points[0].y++;}
+        else if(command == "D") {points[0].y--;}
+        else if (command == "L") { points[0].x--;}
+        else if(command == "R") { points[0].x++;}
+   
+
+    return moveTail(points, arrSize, visited);
+}
+
+
+
 
 int main()
 {
-    std::ifstream inputFile("inputexample.txt");
+    std::ifstream inputFile("input.txt");
     if(inputFile.is_open()) std::cout << "File Opened" << std::endl;
     std::string command, moves;
+    const int knotsPart1 = 2;
+    const int knotsPart2 = 10;
 
-    ropePoint head(0, 0, false), tail(0, 0, true);
+    ropePoint part1[knotsPart1];
+    ropePoint part2[knotsPart2];
 
+    std::map<std::string, bool> visitedPointsPart1;
+    std::map<std::string, bool> visitedPointsPart2;
 
+    visitedPointsPart1.insert({"0,0", true});
+    visitedPointsPart2.insert({"0,0", true});
+    
     while(inputFile >> command >> moves)
     {
-        head.movePoint(command, std::stoi(moves), tail);
-        std::cout << command << " " << moves << std::endl;
+        for(int i = 0; i < stoi(moves); i++)
+        {
+        movePoint(command, part1, knotsPart1, visitedPointsPart1);
+        movePoint(command, part2, knotsPart2, visitedPointsPart2);
+        }
+
+        
     }
-
-
-    std::cout << "Answer to Part 1: " << tail.tailSteps << std::endl;
-    //std::cout << "Answer to Part 2: " << smallestDir << std::endl;
+    std::cout << "Answer Part 1: " << visitedPointsPart1.size() << std::endl;
+    std::cout << "Answer Part 2: " << visitedPointsPart2.size() << std::endl;
     return 0;
 }

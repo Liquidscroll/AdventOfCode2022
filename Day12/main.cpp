@@ -5,6 +5,7 @@
 #include <vector>
 #include <numeric>
 #include <queue>
+#include <ranges>
 
 struct node
 {
@@ -17,11 +18,6 @@ struct node
 
 };
 
-static std::ostream& operator<< (std::ostream& os, node const& n)
-{
-    os << "(" << n.x << "," << n.y << ")";
-    return os;
-}
 static std::vector<node> getNodeNeighbours(int currentX, int currentY, std::vector<std::string> const& heights)
 {
     std::vector<node> neighbours{};
@@ -43,12 +39,12 @@ static std::vector<node> getNodeNeighbours(int currentX, int currentY, std::vect
     {
         neighbours.push_back({.x = currentX, .y = nodeAbove});
     }
-    if(nodeRight < heights[0].size() &&
+    if(nodeRight < (int)heights[0].size() &&
         heights[currentY][nodeRight] <= (currentHeight + 1))
     {
         neighbours.push_back({.x = nodeRight, .y = currentY});
     }
-    if(nodeBelow < heights.size() &&
+    if(nodeBelow < (int)heights.size() &&
         heights[nodeBelow][currentX] <= (currentHeight + 1))
     {
         neighbours.push_back({.x = currentX, .y = nodeBelow});
@@ -56,7 +52,8 @@ static std::vector<node> getNodeNeighbours(int currentX, int currentY, std::vect
 
     return neighbours;
 }
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 node answerPart1(node const& start, node const& end, std::vector<std::string> const& heights)
 {
     std::vector<node> visited{};
@@ -103,15 +100,19 @@ node answerPart1(node const& start, node const& end, std::vector<std::string> co
         return *itr;
     }
 
+
+
 }
+#pragma GCC diagnostic pop
 
 node answerPart2(node const& end, std::vector<std::string> const& heightMap)
 {
     std::vector<node> locations{};
 
-    for(int row = 0; row < heightMap.size(); row++)
+
+    for(int row = 0; row < (int)heightMap.size(); row++)
     {
-        for(int col = 0; col < heightMap[row].size(); col++)
+        for(int col = 0; col < (int)heightMap[row].size(); col++)
         {
             if(heightMap[row][col] == 'a')
             {
@@ -119,27 +120,36 @@ node answerPart2(node const& end, std::vector<std::string> const& heightMap)
             }
         }
     }
+
     std::vector<node> answerVec;
+
     for(node const& start : locations)
     {
+
     answerVec.push_back(answerPart1(start, end, heightMap));
+
     }
+
     node final = answerVec[0];
+
     for(node const& ans : answerVec)
     {
+
         if (ans.cost < final.cost)
         {
             final = ans;
         }
+
     }
+
 
     return final;
 }
 
 int main()
 {
-    std::ifstream inputFile("input.txt");
-    if(inputFile.is_open()) std::cout << "File Opened" << std::endl;
+    std::ifstream inputFile("./input.txt");
+
 
     std::vector<std::string> heightMap;
 
@@ -163,11 +173,11 @@ int main()
             heightMap.back()[pos] = 'z';
         }
     }
-
+    auto heightMap2 = heightMap;
     node ans1 = answerPart1(start, end, heightMap);
     std::cout << "\nAnswer to Part 1: " << ans1.cost << std::endl;
 
-    node ans2 = answerPart2(end, heightMap);
+    node ans2 = answerPart2(end, heightMap2);
     std::cout << "Answer to Part 2: " << ans2.cost << std::endl;
     return 0;
 }

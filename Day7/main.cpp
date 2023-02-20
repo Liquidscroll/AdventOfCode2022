@@ -101,7 +101,7 @@ int main()
 {
     int const &capacity = 70000000;
     std::ifstream inputFile("input.txt");
-    if(inputFile.is_open()) std::cout << "File Opened" << std::endl;
+
     std::vector<fileFolder> dirChildren;
     bool interpretCommands = false;
     fileFolder fileTree { nullptr, 0, true, "/", dirChildren};

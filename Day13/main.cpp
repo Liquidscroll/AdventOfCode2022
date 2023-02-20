@@ -8,7 +8,7 @@ std::vector<std::string> splitString(std::string s)
     int depth = 0;
     std::string temp = "";
 
-    for(int i = 0; i < s.size(); i++)
+    for(int i = 0; i < (int)s.size(); i++)
     {
         if(s[i] == '[')
         {
@@ -40,7 +40,7 @@ std::vector<std::string> splitString(std::string s)
 
 int compareLists(std::vector<std::string> lhs, std::vector<std::string> rhs)
 {
-    for(int i = 0; i < std::min(lhs.size(), rhs.size()); i++)
+    for(int i = 0; i < (int)std::min(lhs.size(), rhs.size()); i++)
     {
         if(lhs[i][0] != '[' && rhs[i][0] != '[')
         {
@@ -73,7 +73,6 @@ int compareLists(std::vector<std::string> lhs, std::vector<std::string> rhs)
 int main()
 {
     std::ifstream inputFile("input.txt");
-    if(inputFile.is_open()) std::cout << "File Opened" << std::endl;
 
     std::string line, line2;
     std::vector<std::string> packets = {"[[2]]", "[[6]]"};

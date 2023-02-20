@@ -81,7 +81,49 @@ struct monkey
         std::cout << "Pass Count: " << this->passCount << std::endl;
     }
 };
-void inspection(std::vector<monkey>& monkeys, monkey& monkey, int currentMonkey, int product)
+
+void inspection(std::vector<monkey>& monkeys, monkey& monkey, int currentMonkey)
+{
+
+
+    for(auto& item : monkey.items)
+    {
+        long long operatorVal;
+        if(monkey.opValue == "old") {
+            operatorVal = item;
+        }
+        else
+        {
+            operatorVal = stoi(monkey.opValue);
+        }
+        if(monkey.symb == "+")
+        {
+            item += operatorVal;
+        }
+        else if(monkey.symb == "*")
+        {
+            item *= operatorVal;
+        }
+
+
+        item = (item / 3);
+
+
+        if(monkey.testItems(item))
+        {
+            monkey.pass(monkeys, true, item);
+            monkeys[currentMonkey].items.erase(std::remove(monkeys[currentMonkey].items.begin(), monkeys[currentMonkey].items.end(), item));
+            monkeys[currentMonkey].passCount++;
+        } else
+        {
+            monkey.pass(monkeys, false, item);
+            monkeys[currentMonkey].items.erase(std::remove(monkeys[currentMonkey].items.begin(), monkeys[currentMonkey].items.end(), item));
+            monkeys[currentMonkey].passCount++;
+        }
+    }
+}
+
+void inspectionPart2(std::vector<monkey>& monkeys, monkey& monkey, int currentMonkey, int product)
 {
 
 
@@ -125,9 +167,8 @@ void inspection(std::vector<monkey>& monkeys, monkey& monkey, int currentMonkey,
 
 int main()
 {
-    std::ifstream inputFile("input.txt");
-    std::cout << "here" << std::endl;
-    if(inputFile.is_open()) { std::cout << "File Opened" << std::endl; }
+    std::fstream inputFile("E:\\AdventOfCode2022\\Day11\\input.txt");
+    if(!inputFile.is_open()) { std::cout << "fail open"; return 0;}
     std::string inputCommand;
     std::vector<monkey> monkeys;
     int currentMonkey = 0;
@@ -191,26 +232,47 @@ int main()
 
     }
 
+    auto monkeys2 = monkeys;
+    long long round = 20;
+    long long round2 = 10000;
 
-    long long round = 10000;
     for(long long i = 0; i < round; i++) {
         int curMonk = 0;
         for (auto monk: monkeys) {
-            inspection(monkeys, monk, curMonk, product);
+            inspection(monkeys, monk, curMonk);
             curMonk++;
         }
     }
 
+    for(long long i = 0; i < round2; i++)
+    {
+        int curMonk = 0;
+        for(auto monk: monkeys2)
+        {
+            inspectionPart2(monkeys2, monk, curMonk, product);
+            curMonk++;
+        }
+    }
+
+
     std::vector<long long> passCounts;
+    std::vector<long long> passCounts2;
     for(auto& monk : monkeys) {
         passCounts.push_back(monk.passCount);
     }
+    for(auto& monk : monkeys2)
+    {
+        passCounts2.push_back(monk.passCount);
+    }
 
     std::sort(passCounts.begin(), passCounts.end(), std::greater<long long>());
+    std::sort(passCounts2.begin(), passCounts2.end(), std::greater<long long>());
 
     long long answer = passCounts[0] * passCounts[1];
+    long long answer2 = passCounts2[0] * passCounts2[1];
 
-    std::cout << "\nAnswer to Part 2: " << answer << std::endl;
-    //std::cout << "Answer to Part 2: " << std::endl;
+    std::cout << "Answer to Part 1: " << answer << std::endl;
+    std::cout << "Answer to Part 2: " << answer2 << std::endl;
+
     return 0;
 }

@@ -66,7 +66,6 @@ std::map<std::string, bool> movePoint(std::string command, ropePoint* points, in
 int main()
 {
     std::ifstream inputFile("input.txt");
-    if(inputFile.is_open()) std::cout << "File Opened" << std::endl;
     std::string command, moves;
     const int knotsPart1 = 2;
     const int knotsPart2 = 10;
